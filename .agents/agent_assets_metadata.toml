@@ -1,0 +1,68 @@
+uploads = []
+outputs = []
+
+[[generated]]
+id = "rAH9nzHRfQWpeisi08BNN"
+uri = "file://artifacts/essex-carpenters/public/images/hero.png"
+type = "image"
+title = "Hero background carpenter at work"
+
+[[generated]]
+id = "MntO2vqxt9btT4tfm0RMz"
+uri = "file://artifacts/essex-carpenters/public/images/about.png"
+type = "image"
+title = "About us two founders workshop"
+
+[[generated]]
+id = "m_HWWu-6H2J3xCHzJUUJq"
+uri = "file://artifacts/essex-carpenters/public/images/founder-1.png"
+type = "image"
+title = "Founder portrait Claudiu"
+
+[[generated]]
+id = "fTuHWzoKzexTLhzR4pmZS"
+uri = "file://artifacts/essex-carpenters/public/images/founder-2.png"
+type = "image"
+title = "Founder portrait Veaceslav"
+
+[[generated]]
+id = "wkZIXILAllnARo8LQ6E7F"
+uri = "file://artifacts/essex-carpenters/public/images/service-1.png"
+type = "image"
+title = "First and second fix carpentry"
+
+[[generated]]
+id = "5ycNpOdxGSNfWC_w31-l7"
+uri = "file://artifacts/essex-carpenters/public/images/service-2.png"
+type = "image"
+title = "Fire door installation"
+
+[[generated]]
+id = "s3IAUWcclYADjZ2aiEcVD"
+uri = "file://artifacts/essex-carpenters/public/images/service-3.png"
+type = "image"
+title = "Premium door installation"
+
+[[generated]]
+id = "BiiwiQwIYQCxyYaay8kxr"
+uri = "file://artifacts/essex-carpenters/public/images/service-4.png"
+type = "image"
+title = "Premium kitchen installation"
+
+[[generated]]
+id = "oJJHt-VXnaU1w8MH6Xamk"
+uri = "file://artifacts/essex-carpenters/public/images/service-5.png"
+type = "image"
+title = "Hardwood flooring installation"
+
+[[generated]]
+id = "Abl9zGSQKusVTcbcM3yQ0"
+uri = "file://artifacts/essex-carpenters/public/images/service-6.png"
+type = "image"
+title = "Bespoke fitted wardrobes"
+
+[[generated]]
+id = "GB9rVfF0WXYc0WjmWcDeG"
+uri = "file://attached_assets/generated_images/cinematic_wide_shot_of_3cb2.png"
+type = "image"
+title = "generated_image"

@@ -1,0 +1,31 @@
+kind = "web"
+previewPath = "/"
+title = "Essex Carpenters"
+version = "1.0.0"
+id = "artifacts/essex-carpenters"
+router = "path"
+
+[[integratedSkills]]
+name = "react-vite"
+version = "1.0.0"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 18494
+
+[services.development]
+run = "pnpm --filter @workspace/essex-carpenters run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/essex-carpenters", "run", "build" ]
+publicDir = "artifacts/essex-carpenters/dist/public"
+serve = "static"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "18494"
+BASE_PATH = "/"

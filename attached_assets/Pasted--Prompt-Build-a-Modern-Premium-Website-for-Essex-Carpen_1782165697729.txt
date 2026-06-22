@@ -1,0 +1,202 @@
+# Prompt: Build a Modern Premium Website for Essex Carpenters
+
+Create a modern, high-end, responsive website for a carpentry and property improvement company called **Essex Carpenters**.
+
+## Design Style
+
+* Premium construction and tradesman aesthetic.
+* Dark charcoal (#1A1A1A), white (#FFFFFF), and warm wood accent colours (#C89B5E).
+* Clean and spacious layout with smooth animations.
+* Use glassmorphism and subtle shadows.
+* Modern typography using **Poppins** or **Inter**.
+* Rounded cards and soft hover animations.
+* Mobile-first responsive design.
+* Include dark and light mode support.
+
+## Technology
+
+* React + Next.js.
+* Tailwind CSS.
+* Framer Motion for animations.
+* Three.js or React Three Fiber for interactive 3D elements.
+* Optimised SEO and performance.
+
+## Homepage
+
+### Hero Section
+
+* Full-screen hero with a cinematic video background showing carpenters at work.
+* Animated headline:
+
+**Quality Carpentry & Property Improvement Services Across Essex and East London**
+
+Subheading:
+
+"Trusted carpentry specialists with over 10 years of experience delivering high-quality workmanship for residential and commercial projects."
+
+Primary CTA:
+
+* Get a Free Quote
+
+Secondary CTA:
+
+* View Our Work
+
+Include animated service badges:
+✓ First & Second Fix Carpentry
+✓ Fire Door Services
+✓ Kitchen Installation
+✓ Flooring Installation
+✓ Bespoke Storage Solutions
+✓ £5 Million Public Liability Cover
+
+## Navigation
+
+* Home
+* About Us
+* Services
+* Projects Gallery
+* Areas Covered
+* Contact
+
+Sticky navigation with transparent-to-solid scroll effect.
+
+## About Us Section
+
+Create a professional company story:
+
+* Founded by Claudiu Doca and Veaceslav Braghis.
+* Over 10 years of industry experience.
+* Residential and commercial expertise.
+* Professional, reliable and quality-driven approach.
+* Fully insured.
+
+Include:
+
+* Animated statistics counters.
+* Professional team cards.
+* Timeline showing company growth.
+
+## Services Section
+
+Create modern service cards with icons and hover animations.
+
+Services:
+
+1. First & Second Fix Carpentry
+2. Fire Door Installation & Inspection
+3. Door Installation
+4. Kitchen Installation
+5. Flooring Installation
+6. Fitted Wardrobes & Bespoke Storage
+7. Property Maintenance & Multitrade Services
+8. Minor Plumbing
+9. Tiling & Re-Grouting
+10. Commercial Fit-Out Carpentry
+
+Each service should have:
+
+* Hero image
+* Description
+* Benefits
+* Process steps
+* Call-to-action button.
+
+## Why Choose Us
+
+Create an interactive section with animated cards:
+
+* Over 10 years of experience.
+* Residential and commercial expertise.
+* Accredited fire door specialists.
+* £5 million public liability insurance.
+* Free quotations.
+* Reliable and friendly service.
+* Direct communication with tradespeople.
+
+## Projects Gallery
+
+Build a masonry-style gallery with:
+
+* Before & after slider.
+* Image lightbox.
+* Category filters:
+
+  * Fire Doors
+  * Kitchens
+  * Flooring
+  * Wardrobes
+  * Commercial Projects
+  * Refurbishments
+
+Include at least 20 project placeholders.
+
+## Areas Covered
+
+Interactive map of Essex and East London highlighting:
+
+* Romford
+* Hornchurch
+* Upminster
+* Brentwood
+* Chelmsford
+* Basildon
+* South Woodford
+* Chingford
+* Loughton
+* Epping
+
+## Testimonials Section
+
+Create modern testimonial cards with:
+
+* Customer photos.
+* Star ratings.
+* Smooth carousel animation.
+
+## Contact Page
+
+Include:
+
+* Contact form with validation.
+* Email: [info@essexcarpenters.co.uk](mailto:info@essexcarpenters.co.uk)
+* Phone number placeholder.
+* Embedded Google Map.
+* Emergency contact button.
+* Free quotation CTA.
+
+## Additional Features
+
+* Floating WhatsApp button.
+* Scroll progress indicator.
+* Loading animations.
+* Cookie consent.
+* SEO optimisation.
+* Schema markup for Local Business.
+* Google Reviews integration.
+* Blog section for future SEO growth.
+
+## Advanced Visual Effects
+
+* Subtle parallax scrolling.
+* 3D floating wood textures using Three.js.
+* Animated counters.
+* Scroll-triggered reveals.
+* Smooth page transitions.
+* Custom cursor on desktop.
+
+## SEO Requirements
+
+Page titles:
+
+* Carpenter Essex
+* Fire Door Installation Essex
+* Kitchen Installation Essex
+* Flooring Installation Essex
+* First & Second Fix Carpentry Essex
+* Fitted Wardrobes Essex
+
+Meta description:
+"Professional carpentry services across Essex and East London. First and second fix carpentry, fire doors, kitchens, flooring, wardrobes and property maintenance. Free quotations."
+
+The final result should feel like a premium construction company website similar in quality to high-end architecture and construction websites, focusing on trust, craftsmanship, and professionalism.

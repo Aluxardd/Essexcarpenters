@@ -1,11 +1,31 @@
 import { motion, useScroll, useTransform, cubicBezier } from "framer-motion";
-import { CheckCircle2, ArrowRight } from "lucide-react";
+import { CheckCircle2 } from "lucide-react";
 import { Button } from "./ui/button";
+import { useState } from "react";
 
 export default function Hero() {
   const { scrollY } = useScroll();
-  const y = useTransform(scrollY, [0, 1000], [0, 300]);
+  const y = useTransform(scrollY, [0, 1000], [0, 180]);
+  const imageY = useTransform(scrollY, [0, 1000], [-20, 90]);
   const opacity = useTransform(scrollY, [0, 500], [1, 0]);
+  const imageScale = useTransform(scrollY, [0, 1000], [1.24, 1.42]);
+  const base = (import.meta as any).env?.BASE_URL ?? "/";
+  const withBase = (p: string) => `${base}${p.startsWith("/") ? p.slice(1) : p}`;
+  const heroImageCandidates = [
+    withBase("images/hero.png"),
+    withBase("images/kitchen1.jpg"),
+    withBase("images/commercial1.jpg"),
+  ];
+  const [imageIndex, setImageIndex] = useState(0);
+
+  function handleHeroImageError() {
+    setImageIndex((prev) => {
+      if (prev < heroImageCandidates.length - 1) {
+        return prev + 1;
+      }
+      return prev;
+    });
+  }
 
   const badges = [
     "First & Second Fix Carpentry",
@@ -33,21 +53,31 @@ export default function Hero() {
   };
 
   return (
-    <section id="home" className="relative h-screen min-h-[600px] flex items-center justify-center overflow-hidden bg-background">
+    <section id="home" className="relative w-full h-screen min-h-150 flex items-center justify-center overflow-hidden bg-background">
       {/* Background Image with Parallax */}
       <motion.div 
-        className="absolute inset-0 z-0"
-        style={{ y, opacity }}
+        className="absolute inset-0 z-0 w-full h-full overflow-hidden"
+        style={{ opacity }}
       >
+        <motion.div
+          className="absolute inset-0 bg-linear-to-br from-stone-950 via-stone-900 to-amber-950"
+          style={{ y }}
+        />
+        <motion.div
+          className="absolute inset-0 opacity-[0.08] bg-[radial-gradient(circle_at_20%_30%,rgba(255,190,92,0.35),transparent_45%),radial-gradient(circle_at_80%_70%,rgba(160,95,25,0.22),transparent_40%)]"
+          style={{ y }}
+        />
         <div className="absolute inset-0 bg-black/60 dark:bg-black/70 z-10" />
-        <img 
-          src="/images/hero.png" 
+        <motion.img 
+          src={heroImageCandidates[imageIndex]} 
           alt="Master Carpenter at Work" 
-          className="w-full h-full object-cover object-center"
+          onError={handleHeroImageError}
+          style={{ y: imageY, scale: imageScale }}
+          className="absolute inset-0 block w-full h-full object-cover object-[center_38%] transition-opacity duration-300 opacity-100 border-0 outline-none ring-0 rounded-none shadow-none"
         />
       </motion.div>
 
-      <div className="container relative z-20 px-4 md:px-6 mt-20">
+      <div className="container relative z-20 px-4 sm:px-6 mt-16 sm:mt-20">
         <motion.div 
           className="max-w-4xl mx-auto text-center"
           variants={container}
@@ -56,25 +86,25 @@ export default function Hero() {
         >
           <motion.h1 
             variants={item}
-            className="text-4xl md:text-6xl lg:text-7xl font-bold font-heading text-white mb-6 leading-[1.1]"
+            className="font-heading text-white mb-4 sm:mb-6 leading-[1.08] font-bold text-[clamp(1.45rem,5vw,3.05rem)]"
           >
             Quality Carpentry & Property Improvement Services Across Essex and East London
           </motion.h1>
           
           <motion.p 
             variants={item}
-            className="text-lg md:text-xl lg:text-2xl text-white/90 mb-10 max-w-3xl mx-auto font-light"
+            className="font-body text-white/90 mb-7 sm:mb-10 max-w-[64ch] mx-auto font-normal text-[clamp(0.84rem,2.35vw,1.08rem)]"
           >
             Trusted carpentry specialists with over 10 years of experience delivering high-quality workmanship for residential and commercial projects.
           </motion.p>
           
           <motion.div 
             variants={item}
-            className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-12"
+            className="hero-compact-actions flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 mb-9 sm:mb-12"
           >
             <Button 
               size="lg" 
-              className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-full px-8 py-6 text-lg w-full sm:w-auto font-semibold"
+              className="hero-compact-btn bg-primary text-primary-foreground hover:bg-primary/90 rounded-full px-6 sm:px-8 py-4 sm:py-6 text-[clamp(0.82rem,1.95vw,0.92rem)] w-full sm:w-auto font-body font-semibold"
               onClick={() => document.querySelector('#contact')?.scrollIntoView({ behavior: 'smooth' })}
             >
               Get a Free Quote
@@ -82,7 +112,7 @@ export default function Hero() {
             <Button 
               size="lg" 
               variant="outline" 
-              className="text-white border-white hover:bg-white/10 rounded-full px-8 py-6 text-lg w-full sm:w-auto font-semibold backdrop-blur-sm"
+              className="hero-compact-btn text-white border-white hover:bg-white/10 rounded-full px-6 sm:px-8 py-4 sm:py-6 text-[clamp(0.82rem,1.95vw,0.92rem)] w-full sm:w-auto font-body font-semibold backdrop-blur-sm"
               onClick={() => document.querySelector('#gallery')?.scrollIntoView({ behavior: 'smooth' })}
             >
               View Our Work
@@ -91,10 +121,10 @@ export default function Hero() {
           
           <motion.div 
             variants={item}
-            className="flex flex-wrap justify-center items-center gap-x-6 gap-y-3 mt-8"
+            className="hero-compact-badges flex flex-wrap justify-center items-center gap-x-3 sm:gap-x-5 gap-y-2.5 sm:gap-y-3 mt-5 sm:mt-8"
           >
             {badges.map((badge, index) => (
-              <div key={index} className="flex items-center gap-2 text-white/90 text-sm md:text-base bg-black/30 px-3 py-1.5 rounded-full backdrop-blur-md border border-white/10">
+              <div key={index} className="hero-compact-badge flex items-center gap-1.5 sm:gap-2 text-white/90 font-body text-[clamp(0.62rem,1.55vw,0.8rem)] bg-black/30 px-2.5 sm:px-3 py-1.5 rounded-full backdrop-blur-md border border-white/10">
                 <CheckCircle2 size={16} className="text-primary" />
                 <span>{badge}</span>
               </div>
@@ -103,29 +133,6 @@ export default function Hero() {
         </motion.div>
       </div>
 
-      {/* Scroll indicator */}
-      <motion.div 
-        className="absolute bottom-8 left-1/2 -translate-x-1/2 z-20 flex flex-col items-center gap-2"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 2, duration: 1 }}
-      >
-        <span className="text-white/60 text-xs uppercase tracking-widest font-semibold">Scroll</span>
-        <div className="w-[1px] h-12 bg-white/20 overflow-hidden relative">
-          <motion.div 
-            className="w-full h-1/2 bg-primary absolute top-0"
-            animate={{ 
-              y: [0, 48],
-              opacity: [0, 1, 0]
-            }}
-            transition={{ 
-              repeat: Infinity,
-              duration: 1.5,
-              ease: "linear"
-            }}
-          />
-        </div>
-      </motion.div>
     </section>
   );
 }

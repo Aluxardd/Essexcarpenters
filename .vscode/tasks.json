@@ -1,0 +1,33 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Dev: Frontend",
+      "type": "shell",
+      "command": "pnpm",
+      "args": [
+        "--filter",
+        "@workspace/essex-carpenters",
+        "dev"
+      ],
+      "isBackground": true,
+      "problemMatcher": []
+    },
+    {
+      "label": "Dev: API (PORT=3000)",
+      "type": "shell",
+      "command": "$env:PORT='3000'; $env:NODE_ENV='development'; pnpm --filter @workspace/api-server dev:watch",
+      "isBackground": true,
+      "problemMatcher": []
+    },
+    {
+      "label": "Dev: Start Frontend + API",
+      "dependsOn": [
+        "Dev: Frontend",
+        "Dev: API (PORT=3000)"
+      ],
+      "dependsOrder": "parallel",
+      "problemMatcher": []
+    }
+  ]
+}

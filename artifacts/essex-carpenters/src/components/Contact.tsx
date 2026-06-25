@@ -124,18 +124,6 @@ export default function Contact() {
               </div>
             </div>
 
-            {/* Trust badge */}
-            <div className="bg-primary/10 border border-primary/20 rounded-2xl p-6">
-              <div className="flex items-center gap-3 mb-3">
-                <div className="p-2 bg-primary rounded-lg">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
-                  </svg>
-                </div>
-                <p className="font-bold font-heading">Fully Insured</p>
-              </div>
-              <p className="text-sm text-muted-foreground">All quotations are free and carry no obligation. We carry £5 million public liability insurance.</p>
-            </div>
           </motion.div>
 
           {/* Form */}
@@ -241,7 +229,7 @@ export default function Contact() {
                   </button>
 
                   <p className="text-xs text-muted-foreground text-center">
-                    No obligation · We respond within 24 hours · Fully insured
+                    No obligation · We respond within 24 hours
                   </p>
                 </form>
               )}

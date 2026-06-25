@@ -6,7 +6,7 @@ export default function FloatingWhatsApp() {
   const [showTooltip, setShowTooltip] = useState(false);
   const [dismissed, setDismissed] = useState(false);
 
-  const whatsappUrl = "https://wa.me/447700000000?text=Hi%20Essex%20Carpenters%2C%20I%27d%20like%20to%20request%20a%20free%20quote.";
+  const whatsappUrl = "https://wa.me/447459414385?text=Hi%20Essex%20Carpenters%2C%20I%27d%20like%20to%20request%20a%20free%20quote.";
 
   return (
     <div className="fixed bottom-6 right-6 z-[90] flex flex-col items-end gap-3">

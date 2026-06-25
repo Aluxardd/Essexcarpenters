@@ -1,10 +1,10 @@
-import { useState, type SyntheticEvent } from "react";
-import { motion, AnimatePresence, LayoutGroup } from "framer-motion";
+import { useEffect, useMemo, useRef, useState, type SyntheticEvent } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { X, ZoomIn } from "lucide-react";
 
-type Category = "All" | "Fire Doors" | "Kitchens" | "Flooring" | "Wardrobes" | "Commercial" | "Refurbishments";
+type Category = "All" | "FD30/60 Fire Door Installations" | "Kitchens" | "Flooring" | "Wardrobes" | "Commercial" | "Refurbishments";
 
-const categories: Category[] = ["All", "Fire Doors", "Kitchens", "Flooring", "Wardrobes", "Commercial", "Refurbishments"];
+const categories: Category[] = ["All", "FD30/60 Fire Door Installations", "Kitchens", "Flooring", "Wardrobes", "Commercial", "Refurbishments"];
 
 // Preferred image filenames per category (user-renamed assets). These will be used when available.
 // Files should be placed in artifacts/essex-carpenters/public/images
@@ -17,11 +17,12 @@ function withBase(p: string) {
 }
 
 const categoryImageCandidates: Record<Exclude<Category, "All">, string[]> = {
-  "Fire Doors": [withBase("images/firedoor1.png")],
-  "Kitchens": [withBase("images/kitchen1.png")],
-  "Flooring": [withBase("images/flooring1.png")],
-  "Wardrobes": [withBase("images/wardrobe1.png")],
-  // Per your request, leave Commercial and Refurbishments as-is (use the legacy service-*.png images)
+  "FD30/60 Fire Door Installations": [withBase("images/firedoor1.jpg"), withBase("images/firedoor2.jpg"), withBase("images/firedoor1.png")],
+  "Kitchens": [withBase("images/kitchen1.jpg"), withBase("images/kitchen2.jpg"), withBase("images/kitchen3.jpg"), withBase("images/kitchen4.jpg"), withBase("images/kitchen5.jpg"), withBase("images/kitchen6.jpg")],
+  "Flooring": [withBase("images/flooring1.jpg"), withBase("images/flooring2.jpg"), withBase("images/flooring3.jpg"), withBase("images/flooring1.png")],
+  "Wardrobes": [withBase("images/wardrobe1.jpg"), withBase("images/wardrobe2.jpg"), withBase("images/wardrobe3.jpg"), withBase("images/wardrobe4.jpg"), withBase("images/wardrobe5.jpg"), withBase("images/wardrobe6.jpg")],
+  "Commercial": [withBase("images/commercial1.jpg"), withBase("images/commercial2.jpg"), withBase("images/commercial3.jpg"), withBase("images/commercial4.jpg"), withBase("images/commercial5.jpg"), withBase("images/commercial6.jpg")],
+  "Refurbishments": [withBase("images/refurb1.jpg"), withBase("images/refurb2.jpg"), withBase("images/refurb3.jpg"), withBase("images/refurb4.jpg")],
 };
 
 function getCandidatesForCategory(category: Category): string[] {
@@ -29,9 +30,14 @@ function getCandidatesForCategory(category: Category): string[] {
   return categoryImageCandidates[category as Exclude<Category, "All">] || [];
 }
 
-function getImageForCategory(category: Category, fallback: string) {
-  const candidates = getCandidatesForCategory(category);
-  return candidates[0] ?? fallback;
+function getFallbackCandidatesForImage(category: Category, primaryImage: string): string[] {
+  return getCandidatesForCategory(category).filter((candidate) => candidate !== primaryImage);
+}
+
+function gridImageSizes(size: string) {
+  if (size === "large") return "(min-width: 1024px) 50vw, (min-width: 768px) 66vw, 100vw";
+  if (size === "medium") return "(min-width: 1024px) 50vw, (min-width: 768px) 66vw, 100vw";
+  return "(min-width: 1024px) 25vw, (min-width: 768px) 33vw, 50vw";
 }
 
 // Tiny transparent PNG (1x1) as a last-resort fallback to avoid broken image icon
@@ -81,42 +87,146 @@ function handleErrorWithCandidates(e: SyntheticEvent<HTMLImageElement, Event>) {
   }
 }
 
+type GridImageProps = {
+  src: string;
+  alt: string;
+  size: string;
+  candidatesCsv: string;
+  legacyFallback: string;
+};
+
+function GridImage({ src, alt, size, candidatesCsv, legacyFallback }: GridImageProps) {
+  const [isVisible, setIsVisible] = useState(false);
+  const imgRef = useRef<HTMLImageElement | null>(null);
+
+  useEffect(() => {
+    const node = imgRef.current;
+    if (!node) return;
+
+    if (!("IntersectionObserver" in window)) {
+      setIsVisible(true);
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((entry) => entry.isIntersecting)) {
+          setIsVisible(true);
+          observer.disconnect();
+        }
+      },
+      { rootMargin: "300px" },
+    );
+
+    observer.observe(node);
+    return () => observer.disconnect();
+  }, []);
+
+  return (
+    <img
+      ref={imgRef}
+      src={isVisible ? src : TRANSPARENT_PX}
+      alt={alt}
+      loading="lazy"
+      decoding="async"
+      fetchPriority="low"
+      sizes={gridImageSizes(size)}
+      data-candidates={candidatesCsv}
+      data-legacy-fallback={legacyFallback}
+      onError={handleErrorWithCandidates}
+      className="absolute inset-0 w-full h-full object-cover"
+      draggable={false}
+    />
+  );
+}
+
 // Gallery items mapped to real images in public/images
 // Note: Using Vite public folder paths like "/images/..." for optimal performance (no bundling of large assets).
 const projects = [
   { id: 1, category: "Kitchens" as Category, title: "Modern Kitchen Fit-Out", location: "Romford", size: "large",
-    image: withBase("images/service-1.png"), alt: "Modern kitchen installation in Romford", bg: "from-amber-900 to-stone-800", overlay: "Kitchen Installation — Romford" },
-  { id: 2, category: "Fire Doors" as Category, title: "FD30 Fire Door Installation", location: "Chelmsford", size: "small",
-    image: withBase("images/service-4.png"), alt: "Fire door installation in Chelmsford", bg: "from-red-900 to-stone-900", overlay: "Fire Door — Chelmsford" },
-  { id: 3, category: "Wardrobes" as Category, title: "Built-In Sliding Wardrobes", location: "Hornchurch", size: "small",
-    image: withBase("images/service-2.png"), alt: "Built-in sliding wardrobes in Hornchurch", bg: "from-stone-700 to-stone-900", overlay: "Wardrobes — Hornchurch" },
-  { id: 4, category: "Flooring" as Category, title: "Hardwood Oak Flooring", location: "Brentwood", size: "medium",
-    image: withBase("images/service-3.png"), alt: "Hardwood oak flooring in Brentwood", bg: "from-yellow-900 to-amber-950", overlay: "Oak Flooring — Brentwood" },
-  { id: 5, category: "Commercial" as Category, title: "Office Fit-Out Carpentry", location: "East London", size: "large",
-    image: withBase("images/service-5.png"), alt: "Commercial office carpentry in East London", bg: "from-zinc-800 to-stone-900", overlay: "Commercial — East London" },
-  { id: 6, category: "Refurbishments" as Category, title: "Full Property Renovation", location: "South Woodford", size: "small",
-    image: withBase("images/service-6.png"), alt: "Property refurbishment in South Woodford", bg: "from-stone-600 to-stone-900", overlay: "Refurbishment — South Woodford" },
-  { id: 7, category: "Kitchens" as Category, title: "Shaker Kitchen Installation", location: "Upminster", size: "small",
-    image: withBase("images/service-1.png"), alt: "Shaker kitchen in Upminster", bg: "from-amber-800 to-stone-900", overlay: "Kitchen — Upminster" },
-  { id: 8, category: "Fire Doors" as Category, title: "Commercial Fire Door Set", location: "Basildon", size: "medium",
-    image: withBase("images/service-4.png"), alt: "Commercial fire doors in Basildon", bg: "from-red-950 to-zinc-900", overlay: "Fire Doors — Basildon" },
-  { id: 9, category: "Flooring" as Category, title: "Engineered Wood Flooring", location: "Chingford", size: "small",
-    image: withBase("images/service-3.png"), alt: "Engineered wood flooring in Chingford", bg: "from-yellow-950 to-stone-900", overlay: "Engineered Flooring — Chingford" },
-  { id: 10, category: "Wardrobes" as Category, title: "Alcove Shelving & Storage", location: "Loughton", size: "small",
-    image: withBase("images/service-2.png"), alt: "Alcove shelving and storage in Loughton", bg: "from-stone-800 to-neutral-900", overlay: "Storage — Loughton" },
-  { id: 11, category: "Commercial" as Category, title: "Reception Desk & Joinery", location: "Romford", size: "medium",
-    image: withBase("images/service-5.png"), alt: "Reception desk joinery in Romford", bg: "from-neutral-700 to-zinc-900", overlay: "Commercial Joinery — Romford" },
-  { id: 12, category: "Refurbishments" as Category, title: "Bathroom Renovation", location: "Epping", size: "small",
-    image: withBase("images/service-6.png"), alt: "Bathroom renovation in Epping", bg: "from-slate-700 to-stone-900", overlay: "Renovation — Epping" },
+    image: withBase("images/kitchen1.jpg"), alt: "Modern kitchen installation - Design 1", bg: "from-amber-900 to-stone-800", overlay: "Kitchen Installation" },
+  { id: 2, category: "Kitchens" as Category, title: "Contemporary Kitchen Design", location: "Southend", size: "small",
+    image: withBase("images/kitchen2.jpg"), alt: "Contemporary kitchen design - Design 2", bg: "from-amber-900 to-stone-800", overlay: "Kitchen Installation" },
+  { id: 3, category: "Kitchens" as Category, title: "Classic Kitchen Renovation", location: "Basildon", size: "small",
+    image: withBase("images/kitchen3.jpg"), alt: "Classic kitchen renovation - Design 3", bg: "from-amber-900 to-stone-800", overlay: "Kitchen Installation" },
+  { id: 4, category: "Kitchens" as Category, title: "Bespoke Kitchen Cabinetry", location: "Colchester", size: "small",
+    image: withBase("images/kitchen4.jpg"), alt: "Bespoke kitchen cabinetry - Design 4", bg: "from-amber-900 to-stone-800", overlay: "Kitchen Installation" },
+  { id: 5, category: "Kitchens" as Category, title: "Luxury Kitchen Installation", location: "Chelmsford", size: "medium",
+    image: withBase("images/kitchen5.jpg"), alt: "Luxury kitchen installation - Design 5", bg: "from-amber-900 to-stone-800", overlay: "Kitchen Installation" },
+  { id: 6, category: "Kitchens" as Category, title: "Premium Kitchen Suite", location: "Loughton", size: "small",
+    image: withBase("images/kitchen6.jpg"), alt: "Premium kitchen suite - Design 6", bg: "from-amber-900 to-stone-800", overlay: "Kitchen Installation" },
+  { id: 7, category: "FD30/60 Fire Door Installations" as Category, title: "FD60 Fire Door Installation", location: "Chelmsford", size: "small",
+    image: withBase("images/firedoor1.jpg"), alt: "FD60 fire door installation - Project 1", bg: "from-red-900 to-stone-900", overlay: "Fire Door Installation" },
+  { id: 8, category: "FD30/60 Fire Door Installations" as Category, title: "FD60 Fire Door Upgrade", location: "Romford", size: "small",
+    image: withBase("images/firedoor2.jpg"), alt: "FD60 fire door upgrade - Project 2", bg: "from-red-900 to-stone-900", overlay: "Fire Door Installation" },
+  { id: 9, category: "Wardrobes" as Category, title: "Built-In Sliding Wardrobes", location: "Hornchurch", size: "small",
+    image: withBase("images/wardrobe1.jpg"), alt: "Built-in sliding wardrobes - Project 1", bg: "from-stone-700 to-stone-900", overlay: "Wardrobes" },
+  { id: 10, category: "Wardrobes" as Category, title: "Walk-In Wardrobe Joinery", location: "Romford", size: "small",
+    image: withBase("images/wardrobe2.jpg"), alt: "Walk-in wardrobe joinery - Project 2", bg: "from-stone-700 to-stone-900", overlay: "Wardrobes" },
+  { id: 11, category: "Wardrobes" as Category, title: "Mirror Door Wardrobe Fit", location: "Barking", size: "small",
+    image: withBase("images/wardrobe3.jpg"), alt: "Mirror door wardrobe fit - Project 3", bg: "from-stone-700 to-stone-900", overlay: "Wardrobes" },
+  { id: 12, category: "Wardrobes" as Category, title: "Bespoke Alcove Wardrobe", location: "Upminster", size: "small",
+    image: withBase("images/wardrobe4.jpg"), alt: "Bespoke alcove wardrobe - Project 4", bg: "from-stone-700 to-stone-900", overlay: "Wardrobes" },
+  { id: 13, category: "Wardrobes" as Category, title: "Full Height Wardrobe Suite", location: "Dagenham", size: "medium",
+    image: withBase("images/wardrobe5.jpg"), alt: "Full height wardrobe suite - Project 5", bg: "from-stone-700 to-stone-900", overlay: "Wardrobes" },
+  { id: 21, category: "Wardrobes" as Category, title: "Modern Wardrobe Storage Wall", location: "Ilford", size: "small",
+    image: withBase("images/wardrobe6.jpg"), alt: "Modern wardrobe storage wall - Project 6", bg: "from-stone-700 to-stone-900", overlay: "Wardrobes" },
+  { id: 14, category: "Flooring" as Category, title: "Hardwood Oak Flooring", location: "Brentwood", size: "medium",
+    image: withBase("images/flooring1.jpg"), alt: "Hardwood oak flooring - Project 1", bg: "from-yellow-900 to-amber-950", overlay: "Oak Flooring" },
+  { id: 15, category: "Flooring" as Category, title: "Engineered Wood Flooring", location: "Ilford", size: "small",
+    image: withBase("images/flooring2.jpg"), alt: "Engineered wood flooring - Project 2", bg: "from-yellow-900 to-amber-950", overlay: "Wood Flooring" },
+  { id: 16, category: "Flooring" as Category, title: "Premium Laminate Finish", location: "Chigwell", size: "small",
+    image: withBase("images/flooring3.jpg"), alt: "Premium laminate flooring - Project 3", bg: "from-yellow-900 to-amber-950", overlay: "Laminate Flooring" },
+  { id: 17, category: "Commercial" as Category, title: "Office Fit-Out Carpentry", location: "East London", size: "large",
+    image: withBase("images/commercial1.jpg"), alt: "Commercial carpentry fit-out - Project 1", bg: "from-zinc-800 to-stone-900", overlay: "Commercial" },
+  { id: 18, category: "Commercial" as Category, title: "Retail Unit Joinery", location: "Stratford", size: "small",
+    image: withBase("images/commercial2.jpg"), alt: "Retail unit joinery - Project 2", bg: "from-zinc-800 to-stone-900", overlay: "Commercial" },
+  { id: 19, category: "Commercial" as Category, title: "Commercial Exterior Carpentry", location: "Canary Wharf", size: "small",
+    image: withBase("images/commercial3.jpg"), alt: "Commercial Exterior carpentry - Project 3", bg: "from-zinc-800 to-stone-900", overlay: "Commercial" },
+  { id: 22, category: "Commercial" as Category, title: "Business Unit Refit", location: "Ilford", size: "small",
+    image: withBase("images/commercial4.jpg"), alt: "Business unit refit - Project 4", bg: "from-zinc-800 to-stone-900", overlay: "Commercial" },
+  { id: 23, category: "Commercial" as Category, title: "Reception Area Carpentry", location: "Romford", size: "small",
+    image: withBase("images/commercial5.jpg"), alt: "Reception area carpentry - Project 5", bg: "from-zinc-800 to-stone-900", overlay: "Commercial" },
+  { id: 24, category: "Commercial" as Category, title: "Retail Joinery Installation", location: "Barking", size: "medium",
+    image: withBase("images/commercial6.jpg"), alt: "Retail joinery installation - Project 6", bg: "from-zinc-800 to-stone-900", overlay: "Commercial" },
+  { id: 20, category: "Refurbishments" as Category, title: "Full Property Renovation", location: "South Woodford", size: "small",
+    image: withBase("images/refurb1.jpg"), alt: "Property refurbishment - Project 1", bg: "from-stone-600 to-stone-900", overlay: "Refurbishment" },
+  { id: 25, category: "Refurbishments" as Category, title: "Extension Unit", location: "Billericay", size: "small",
+    image: withBase("images/refurb2.jpg"), alt: "Kitchen and living refit - Project 2", bg: "from-stone-600 to-stone-900", overlay: "Refurbishment" },
+  { id: 26, category: "Refurbishments" as Category, title: "Complete Interior Upgrade", location: "Loughton", size: "medium",
+    image: withBase("images/refurb3.jpg"), alt: "Complete interior upgrade - Project 3", bg: "from-stone-600 to-stone-900", overlay: "Refurbishment" },
+  { id: 27, category: "Refurbishments" as Category, title: "Residential Refurbishment Works", location: "Chadwell Heath", size: "small",
+    image: withBase("images/refurb4.jpg"), alt: "Residential refurbishment works - Project 4", bg: "from-stone-600 to-stone-900", overlay: "Refurbishment" },
 ];
 
 export default function Gallery() {
   const [activeCategory, setActiveCategory] = useState<Category>("All");
   const [lightboxItem, setLightboxItem] = useState<typeof projects[0] | null>(null);
+  const [visibleCount, setVisibleCount] = useState(12);
 
-  const filtered = activeCategory === "All"
-    ? projects
-    : projects.filter(p => p.category === activeCategory);
+  // Guard against accidental duplicate entries in content data.
+  const uniqueProjects = useMemo(() => projects.filter((project, index, all) =>
+    all.findIndex((p) => p.id === project.id) === index
+  ), []);
+
+  const filtered = useMemo(() => activeCategory === "All"
+    ? uniqueProjects
+    : uniqueProjects.filter((p) => p.category === activeCategory), [activeCategory, uniqueProjects]);
+
+  useEffect(() => {
+    setVisibleCount(activeCategory === "All" ? 12 : 24);
+  }, [activeCategory]);
+
+  const visibleProjects = useMemo(
+    () => filtered.slice(0, visibleCount),
+    [filtered, visibleCount],
+  );
+
+  function preloadImage(src: string) {
+    const img = new Image();
+    img.decoding = "async";
+    img.src = src;
+  }
 
   return (
     <section id="gallery" className="py-20 md:py-32 bg-background">
@@ -163,32 +273,34 @@ export default function Gallery() {
         </div>
 
         {/* Masonry Grid */}
-        <LayoutGroup>
-          <motion.div layout className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4">
-            <AnimatePresence mode="popLayout">
-              {filtered.map((project) => (
-                <motion.div
-                  key={project.id}
-                  layout
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.9 }}
-                  transition={{ duration: 0.35 }}
-                  className={`relative group cursor-pointer rounded-2xl overflow-hidden border border-border/40 hover:border-primary/50 transition-all duration-300 ${
-                    project.size === 'large' ? 'col-span-2 row-span-2' : project.size === 'medium' ? 'col-span-2' : ''
-                  }`}
-                  style={{ minHeight: project.size === 'large' ? 360 : project.size === 'medium' ? 200 : 180 }}
-                  onClick={() => setLightboxItem(project)}
-                >
+        <motion.div
+          key={activeCategory}
+          initial={{ opacity: 0.75 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.2 }}
+          className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 grid-flow-dense gap-3 md:gap-4"
+        >
+          {visibleProjects.map((project) => (
+            <div
+              key={project.id}
+              className={`relative group cursor-pointer rounded-2xl overflow-hidden border border-border/40 hover:border-primary/50 transition-all duration-300 ${
+                project.size === 'large' ? 'col-span-2 row-span-2' : project.size === 'medium' ? 'col-span-2' : ''
+              }`}
+              style={{
+                minHeight: project.size === 'large' ? 360 : project.size === 'medium' ? 200 : 180,
+                contentVisibility: "auto",
+                containIntrinsicSize: project.size === "large" ? "360px" : project.size === "medium" ? "200px" : "180px",
+              }}
+              onMouseEnter={() => preloadImage(project.image)}
+              onClick={() => setLightboxItem(project)}
+            >
                   {/* Image */}
-                  <img
-                    src={getImageForCategory(project.category, project.image)}
+                  <GridImage
+                    src={project.image}
                     alt={project.alt}
-                    loading="lazy"
-                    data-candidates={getCandidatesForCategory(project.category).join(",")}
-                    data-legacy-fallback={project.image}
-                    onError={handleErrorWithCandidates}
-                    className="absolute inset-0 w-full h-full object-cover"
+                    size={project.size}
+                    candidatesCsv={getFallbackCandidatesForImage(project.category, project.image).join(",")}
+                    legacyFallback={project.image}
                   />
 
                   {/* Subtle tinted gradient over image */}
@@ -210,11 +322,20 @@ export default function Gallery() {
                   <div className="absolute top-3 left-3 bg-black/40 backdrop-blur-sm text-white text-xs px-2.5 py-1 rounded-full border border-white/10">
                     {project.category}
                   </div>
-                </motion.div>
-              ))}
-            </AnimatePresence>
-          </motion.div>
-        </LayoutGroup>
+            </div>
+          ))}
+        </motion.div>
+
+        {activeCategory === "All" && visibleCount < filtered.length && (
+          <div className="mt-8 flex justify-center">
+            <button
+              onClick={() => setVisibleCount((prev) => prev + 8)}
+              className="rounded-full border border-primary/40 bg-primary/10 px-5 py-2.5 text-sm font-semibold text-primary hover:bg-primary/20 transition-colors"
+            >
+              Load More Projects
+            </button>
+          </div>
+        )}
 
         {/* Lightbox */}
         <AnimatePresence>
@@ -236,9 +357,12 @@ export default function Gallery() {
               >
                 <div className="relative bg-black">
                   <img
-                    src={getImageForCategory(lightboxItem.category, lightboxItem.image)}
+                    src={lightboxItem.image}
                     alt={lightboxItem.alt}
-                    data-candidates={getCandidatesForCategory(lightboxItem.category).join(",")}
+                    loading="eager"
+                    decoding="async"
+                    fetchPriority="high"
+                    data-candidates={getFallbackCandidatesForImage(lightboxItem.category, lightboxItem.image).join(",")}
                     data-legacy-fallback={lightboxItem.image}
                     onError={handleErrorWithCandidates}
                     className="w-full h-auto max-h-[70vh] object-contain bg-black"

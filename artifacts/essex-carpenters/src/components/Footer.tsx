@@ -1,4 +1,5 @@
 import { Hammer, Mail, Instagram, Facebook } from "lucide-react";
+import { Link } from "wouter";
 
 const navLinks = [
   { label: "Home", href: "#home" },
@@ -111,7 +112,18 @@ export default function Footer() {
       <div className="border-t border-border">
         <div className="container px-4 md:px-6 mx-auto py-5 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-muted-foreground">
           <p>© {new Date().getFullYear()} Essex Carpenters. All rights reserved.</p>
-          <p>Claudiu Doca & Veaceslav Braghis · Essex & East London</p>
+          <div className="flex items-center gap-3">
+            <Link href="/privacy-policy" className="hover:text-primary transition-colors">Privacy Policy</Link>
+            <span>·</span>
+            <Link href="/cookie-policy" className="hover:text-primary transition-colors">Cookie Policy</Link>
+            <span>·</span>
+            <button
+              onClick={() => window.dispatchEvent(new Event("open-cookie-preferences"))}
+              className="hover:text-primary transition-colors"
+            >
+              Cookie Settings
+            </button>
+          </div>
           <p>Fully Insured · Est. 2014</p>
         </div>
       </div>

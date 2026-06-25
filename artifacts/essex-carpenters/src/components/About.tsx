@@ -22,7 +22,6 @@ export default function About() {
     <section id="about" className="py-20 md:py-32 bg-secondary/5 overflow-hidden">
       <div className="container px-4 md:px-6 mx-auto">
         <div className="grid lg:grid-cols-2 gap-16 items-center mb-24">
-          {/* Text Content */}
           <motion.div
             initial={{ opacity: 0, x: -40 }}
             whileInView={{ opacity: 1, x: 0 }}
@@ -64,7 +63,6 @@ export default function About() {
             </button>
           </motion.div>
 
-          {/* Team Cards */}
           <motion.div
             initial={{ opacity: 0, x: 40 }}
             whileInView={{ opacity: 1, x: 0 }}
@@ -72,34 +70,30 @@ export default function About() {
             transition={{ duration: 0.7, delay: 0.2 }}
             className="flex flex-col gap-6"
           >
-            {/* Founders */}
-            <div className="grid grid-cols-2 gap-4">
-              {[
-                { name: "Claudiu Doca", role: "Co-Founder & Lead Carpenter", initials: "CD" },
-                { name: "Veaceslav Braghis", role: "Co-Founder & Site Manager", initials: "VB" }
-              ].map((person, i) => (
-                <motion.div
-                  key={i}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.5, delay: 0.3 + i * 0.1 }}
-                  className="bg-card border border-border rounded-2xl p-6 text-center group hover:border-primary/50 transition-colors"
-                >
-                  <div className="w-20 h-20 rounded-full bg-gradient-to-br from-primary/30 to-primary/10 border-2 border-primary/30 flex items-center justify-center mx-auto mb-4 text-primary font-bold font-heading text-2xl group-hover:border-primary transition-colors">
-                    {person.initials}
-                  </div>
-                  <h3 className="font-bold font-heading text-lg mb-1">{person.name}</h3>
-                  <p className="text-sm text-muted-foreground">{person.role}</p>
-                </motion.div>
-              ))}
-            </div>
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: 0.3 }}
+              className="overflow-hidden rounded-2xl bg-card border border-border"
+            >
+              <div className="aspect-4/3 overflow-hidden">
+                <img
+                  src="/images/founders.png"
+                  alt="Essex Carpenters founders"
+                  className="block w-full h-full object-cover object-center scale-[1.08]"
+                />
+              </div>
+              <div className="p-6 pt-4 text-center">
+                <h3 className="font-bold font-heading text-lg">Founders</h3>
+                <p className="text-sm text-muted-foreground">Claudiu Doca and Veaceslav Braghis, co-founders of Essex Carpenters</p>
+              </div>
+            </motion.div>
 
-            {/* Insurance badge */}
             <div className="bg-primary/10 border border-primary/20 rounded-2xl p-6 flex items-center gap-4">
               <div className="p-3 bg-primary rounded-xl shrink-0">
                 <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                  <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
                 </svg>
               </div>
               <div>
@@ -110,14 +104,12 @@ export default function About() {
           </motion.div>
         </div>
 
-        {/* Timeline */}
         <div>
           <div className="text-center mb-12">
             <h3 className="text-2xl md:text-3xl font-bold font-heading mb-2">Our Journey</h3>
             <div className="w-12 h-1 bg-primary mx-auto rounded-full" />
           </div>
           <div className="relative">
-            {/* Line */}
             <div className="absolute left-1/2 -translate-x-1/2 top-0 bottom-0 w-px bg-border hidden md:block" />
             <div className="flex flex-col gap-8">
               {milestones.map((milestone, i) => (
@@ -135,7 +127,6 @@ export default function About() {
                       <p className="text-muted-foreground text-sm">{milestone.event}</p>
                     </div>
                   </div>
-                  {/* Center dot */}
                   <div className="hidden md:flex absolute left-1/2 -translate-x-1/2 w-4 h-4 bg-primary rounded-full border-4 border-background z-10 shrink-0" />
                   <div className="md:w-1/2" />
                 </motion.div>

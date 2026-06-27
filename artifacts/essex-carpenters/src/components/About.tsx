@@ -6,14 +6,13 @@ const milestones = [
   { year: "2016", event: "First major commercial contract — office fit-out in Romford" },
   { year: "2018", event: "Achieved accreditation as certified fire door specialists" },
   { year: "2020", event: "Expanded team and geographic coverage across East London" },
-  { year: "2024", event: "500+ completed projects and £5M public liability insurance" }
+  { year: "2024", event: "500+ completed projects across Essex and East London" }
 ];
 
 const values = [
   "Turning up when we say we will",
   "Clear communication throughout",
   "Work we're proud to put our name to",
-  "Fully insured — £5 million liability cover",
   "Residential and commercial expertise"
 ];
 
@@ -89,18 +88,6 @@ export default function About() {
                 <p className="text-sm text-muted-foreground">Claudiu Doca and Veaceslav Braghis, co-founders of Essex Carpenters</p>
               </div>
             </motion.div>
-
-            <div className="bg-primary/10 border border-primary/20 rounded-2xl p-6 flex items-center gap-4">
-              <div className="p-3 bg-primary rounded-xl shrink-0">
-                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
-                </svg>
-              </div>
-              <div>
-                <p className="font-bold font-heading text-lg">Fully Insured</p>
-                <p className="text-muted-foreground text-sm">£5 Million Public Liability Cover — complete peace of mind on every project</p>
-              </div>
-            </div>
           </motion.div>
         </div>
 

@@ -5,6 +5,9 @@ import { z } from "zod";
 import { useState } from "react";
 import { Mail, Phone, Clock, Send, CheckCircle2 } from "lucide-react";
 
+const whatsappUrl = "https://wa.me/447459414385?text=Hi%20Essex%20Carpenters%2C%20I%27d%20like%20to%20request%20a%20free%20quote.";
+const phonePattern = /^[+\d][\d\s()-]{8,20}$/;
+
 const services = [
   "First & Second Fix Carpentry",
   "Fire Door Installation & Inspection",
@@ -20,9 +23,18 @@ const services = [
 ];
 
 const schema = z.object({
-  name: z.string().min(2, "Please enter your name"),
+  name: z.string()
+    .trim()
+    .min(2, "Please enter your name")
+    .regex(/^[A-Za-z\s'-]+$/, "Name can only contain letters, spaces, apostrophes, or hyphens"),
   email: z.string().email("Please enter a valid email"),
-  phone: z.string().min(7, "Please enter a phone number"),
+  phone: z.string()
+    .trim()
+    .regex(phonePattern, "Please enter a valid phone number")
+    .refine((value) => {
+      const digits = value.replace(/\D/g, "");
+      return digits.length >= 10 && digits.length <= 15;
+    }, "Please enter a valid phone number"),
   service: z.string().min(1, "Please select a service"),
   message: z.string().min(10, "Please tell us a bit about your project"),
 });
@@ -31,6 +43,7 @@ type FormData = z.infer<typeof schema>;
 
 export default function Contact() {
   const [submitted, setSubmitted] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
   const {
     register,
@@ -42,9 +55,22 @@ export default function Contact() {
   });
 
   const onSubmit = async (data: FormData) => {
-    // Simulate form submission
-    await new Promise(resolve => setTimeout(resolve, 1200));
-    console.log("Form submitted:", data);
+    setSubmitError(null);
+
+    const response = await fetch("/api/contact", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    });
+
+    if (!response.ok) {
+      const result = await response.json().catch(() => null);
+      setSubmitError(result?.error ?? "Unable to send your enquiry right now. Please try again.");
+      return;
+    }
+
     setSubmitted(true);
     reset();
     setTimeout(() => setSubmitted(false), 5000);
@@ -104,8 +130,14 @@ export default function Contact() {
                 <Phone className="w-6 h-6 text-primary" />
               </div>
               <div>
-                <p className="font-bold font-heading mb-1">Call Us</p>
-                <p className="text-muted-foreground text-sm">[Phone number available on request]</p>
+                <a
+                  href={whatsappUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="font-bold font-heading mb-1 inline-flex text-foreground hover:text-primary transition-colors"
+                >
+                  Text or call on WhatsApp
+                </a>
                 <p className="text-xs text-muted-foreground mt-1">Mon–Fri 7am–6pm · Sat 8am–2pm</p>
               </div>
             </div>
@@ -148,66 +180,101 @@ export default function Contact() {
                   </div>
                   <h3 className="text-2xl font-bold font-heading">Thank You!</h3>
                   <p className="text-muted-foreground max-w-sm">
-                    We've received your enquiry and will be in touch within 24 hours with your free quotation.
+                    We've received your enquiry at info@essexcarpenters.co.uk and will be in touch within 24 hours with your free quotation.
                   </p>
                 </motion.div>
               ) : (
-                <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-5 relative z-10">
+                <form onSubmit={handleSubmit(onSubmit)} noValidate className="flex flex-col gap-5 relative z-10">
+                  {submitError && (
+                    <div className="rounded-xl border border-red-500/40 bg-red-500/10 px-4 py-3 text-sm text-red-600">
+                      {submitError}
+                    </div>
+                  )}
+
                   <div className="grid sm:grid-cols-2 gap-4">
                     <div>
-                      <label className="text-sm font-semibold mb-1.5 block">Your Name</label>
+                      <label htmlFor="contact-name" className="text-sm font-semibold mb-1.5 block">Your Name</label>
                       <input
-                        {...register("name")}
+                        {...register("name", {
+                          setValueAs: (value) => value.trim(),
+                          onChange: (event) => {
+                            event.target.value = event.target.value.replace(/[^A-Za-z\s'-]/g, "");
+                          }
+                        })}
+                        id="contact-name"
                         placeholder="John Smith"
-                        className="w-full bg-background border border-border rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/30 transition-all placeholder:text-muted-foreground/60"
+                        aria-invalid={!!errors.name}
+                        aria-describedby={errors.name ? "contact-name-error" : undefined}
+                        autoComplete="name"
+                        className={`w-full bg-background border rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-1 transition-all placeholder:text-muted-foreground/60 ${errors.name ? "border-red-500 focus:border-red-500 focus:ring-red-500/30" : "border-border focus:border-primary focus:ring-primary/30"}`}
                       />
-                      {errors.name && <p className="text-red-500 text-xs mt-1">{errors.name.message}</p>}
+                      {errors.name && <p id="contact-name-error" className="text-red-500 text-xs mt-1">{errors.name.message}</p>}
                     </div>
                     <div>
-                      <label className="text-sm font-semibold mb-1.5 block">Email Address</label>
+                      <label htmlFor="contact-email" className="text-sm font-semibold mb-1.5 block">Email Address</label>
                       <input
                         {...register("email")}
+                        id="contact-email"
                         type="email"
                         placeholder="john@example.com"
-                        className="w-full bg-background border border-border rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/30 transition-all placeholder:text-muted-foreground/60"
+                        aria-invalid={!!errors.email}
+                        aria-describedby={errors.email ? "contact-email-error" : undefined}
+                        autoComplete="email"
+                        className={`w-full bg-background border rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-1 transition-all placeholder:text-muted-foreground/60 ${errors.email ? "border-red-500 focus:border-red-500 focus:ring-red-500/30" : "border-border focus:border-primary focus:ring-primary/30"}`}
                       />
-                      {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email.message}</p>}
+                      {errors.email && <p id="contact-email-error" className="text-red-500 text-xs mt-1">{errors.email.message}</p>}
                     </div>
                   </div>
 
                   <div className="grid sm:grid-cols-2 gap-4">
                     <div>
-                      <label className="text-sm font-semibold mb-1.5 block">Phone Number</label>
+                      <label htmlFor="contact-phone" className="text-sm font-semibold mb-1.5 block">Phone Number</label>
                       <input
-                        {...register("phone")}
+                        {...register("phone", {
+                          setValueAs: (value) => value.trim(),
+                          onChange: (event) => {
+                            event.target.value = event.target.value.replace(/[^\d\s()+-]/g, "");
+                          }
+                        })}
+                        id="contact-phone"
                         type="tel"
-                        placeholder="+44 7700 000000"
-                        className="w-full bg-background border border-border rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/30 transition-all placeholder:text-muted-foreground/60"
+                        inputMode="tel"
+                        placeholder="07700 000000"
+                        aria-invalid={!!errors.phone}
+                        aria-describedby={errors.phone ? "contact-phone-error" : undefined}
+                        autoComplete="tel"
+                        className={`w-full bg-background border rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-1 transition-all placeholder:text-muted-foreground/60 ${errors.phone ? "border-red-500 focus:border-red-500 focus:ring-red-500/30" : "border-border focus:border-primary focus:ring-primary/30"}`}
                       />
-                      {errors.phone && <p className="text-red-500 text-xs mt-1">{errors.phone.message}</p>}
+                      {errors.phone && <p id="contact-phone-error" className="text-red-500 text-xs mt-1">{errors.phone.message}</p>}
                     </div>
                     <div>
-                      <label className="text-sm font-semibold mb-1.5 block">Service Required</label>
+                      <label htmlFor="contact-service" className="text-sm font-semibold mb-1.5 block">Service Required</label>
                       <select
                         {...register("service")}
-                        className="w-full bg-background border border-border rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/30 transition-all text-foreground"
+                        id="contact-service"
+                        aria-invalid={!!errors.service}
+                        aria-describedby={errors.service ? "contact-service-error" : undefined}
+                        className={`w-full bg-background border rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-1 transition-all text-foreground ${errors.service ? "border-red-500 focus:border-red-500 focus:ring-red-500/30" : "border-border focus:border-primary focus:ring-primary/30"}`}
                       >
                         <option value="">Select a service...</option>
                         {services.map(s => <option key={s} value={s}>{s}</option>)}
                       </select>
-                      {errors.service && <p className="text-red-500 text-xs mt-1">{errors.service.message}</p>}
+                      {errors.service && <p id="contact-service-error" className="text-red-500 text-xs mt-1">{errors.service.message}</p>}
                     </div>
                   </div>
 
                   <div>
-                    <label className="text-sm font-semibold mb-1.5 block">Tell Us About Your Project</label>
+                    <label htmlFor="contact-message" className="text-sm font-semibold mb-1.5 block">Tell Us About Your Project</label>
                     <textarea
                       {...register("message")}
+                      id="contact-message"
                       rows={5}
                       placeholder="Please describe the work you need done, the location, and any other details that would help us provide an accurate quote..."
-                      className="w-full bg-background border border-border rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/30 transition-all placeholder:text-muted-foreground/60 resize-none"
+                      aria-invalid={!!errors.message}
+                      aria-describedby={errors.message ? "contact-message-error" : undefined}
+                      className={`w-full bg-background border rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-1 transition-all placeholder:text-muted-foreground/60 resize-none ${errors.message ? "border-red-500 focus:border-red-500 focus:ring-red-500/30" : "border-border focus:border-primary focus:ring-primary/30"}`}
                     />
-                    {errors.message && <p className="text-red-500 text-xs mt-1">{errors.message.message}</p>}
+                    {errors.message && <p id="contact-message-error" className="text-red-500 text-xs mt-1">{errors.message.message}</p>}
                   </div>
 
                   <button

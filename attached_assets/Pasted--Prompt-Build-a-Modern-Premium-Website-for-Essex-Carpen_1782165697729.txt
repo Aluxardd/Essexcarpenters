@@ -48,7 +48,6 @@ Include animated service badges:
 ✓ Kitchen Installation
 ✓ Flooring Installation
 ✓ Bespoke Storage Solutions
-✓ £5 Million Public Liability Cover
 
 ## Navigation
 
@@ -69,7 +68,6 @@ Create a professional company story:
 * Over 10 years of industry experience.
 * Residential and commercial expertise.
 * Professional, reliable and quality-driven approach.
-* Fully insured.
 
 Include:
 
@@ -109,7 +107,6 @@ Create an interactive section with animated cards:
 * Over 10 years of experience.
 * Residential and commercial expertise.
 * Accredited fire door specialists.
-* £5 million public liability insurance.
 * Free quotations.
 * Reliable and friendly service.
 * Direct communication with tradespeople.

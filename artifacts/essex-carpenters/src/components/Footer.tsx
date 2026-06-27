@@ -1,5 +1,7 @@
-import { Hammer, Mail, Instagram, Facebook } from "lucide-react";
+import { Hammer, Mail, MessageCircle } from "lucide-react";
 import { Link } from "wouter";
+
+const whatsappUrl = "https://wa.me/447459414385?text=Hi%20Essex%20Carpenters%2C%20I%27d%20like%20to%20request%20a%20free%20quote.";
 
 const navLinks = [
   { label: "Home", href: "#home" },
@@ -40,12 +42,6 @@ export default function Footer() {
           <p className="text-muted-foreground text-sm leading-relaxed mb-6">
             Quality carpentry and property improvement services across Essex and East London. Established 2014.
           </p>
-          <div className="flex items-center gap-1 text-xs font-medium bg-primary/10 border border-primary/20 text-primary rounded-full px-3 py-1.5 w-fit">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
-            </svg>
-            Fully Insured · £5M Liability Cover
-          </div>
         </div>
 
         {/* Navigation */}
@@ -90,13 +86,14 @@ export default function Footer() {
               <Mail size={16} className="text-primary shrink-0" />
               info@essexcarpenters.co.uk
             </a>
-          </div>
-          <div className="flex gap-3">
-            <a href="#" className="p-2.5 bg-secondary rounded-lg text-muted-foreground hover:text-primary hover:bg-primary/10 transition-all border border-border hover:border-primary/40">
-              <Instagram size={18} />
-            </a>
-            <a href="#" className="p-2.5 bg-secondary rounded-lg text-muted-foreground hover:text-primary hover:bg-primary/10 transition-all border border-border hover:border-primary/40">
-              <Facebook size={18} />
+            <a
+              href={whatsappUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-3 text-sm text-muted-foreground hover:text-primary transition-colors"
+            >
+              <MessageCircle size={16} className="text-primary shrink-0" />
+              Text or call on WhatsApp
             </a>
           </div>
           <button
@@ -124,7 +121,7 @@ export default function Footer() {
               Cookie Settings
             </button>
           </div>
-          <p>Fully Insured · Est. 2014</p>
+          <p>Est. 2014</p>
         </div>
       </div>
     </footer>

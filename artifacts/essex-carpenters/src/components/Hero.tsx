@@ -32,8 +32,7 @@ export default function Hero() {
     "Fire Door Services",
     "Kitchen Installation",
     "Flooring Installation",
-    "Bespoke Storage Solutions",
-    "£5M Public Liability Cover"
+    "Bespoke Storage Solutions"
   ];
 
   const container = {

@@ -49,7 +49,6 @@ export default function WhyChooseUs() {
   const stats = [
     { value: 10, suffix: "+", label: "Years Experience", icon: <Clock className="w-6 h-6 text-primary mb-2" /> },
     { value: 500, suffix: "+", label: "Projects Completed", icon: <Briefcase className="w-6 h-6 text-primary mb-2" /> },
-    { value: 5, suffix: "M", prefix: "£", label: "Liability Cover", icon: <ShieldCheck className="w-6 h-6 text-primary mb-2" /> },
     { value: 100, suffix: "%", label: "Satisfaction", icon: <ThumbsUp className="w-6 h-6 text-primary mb-2" /> }
   ];
 
@@ -57,7 +56,6 @@ export default function WhyChooseUs() {
     { title: "Over 10 years experience", icon: <Award className="w-8 h-8 text-primary" /> },
     { title: "Residential & commercial", icon: <Home className="w-8 h-8 text-primary" /> },
     { title: "Accredited fire doors", icon: <ShieldCheck className="w-8 h-8 text-primary" /> },
-    { title: "£5M public liability", icon: <ShieldCheck className="w-8 h-8 text-primary" /> },
     { title: "Free quotations", icon: <MessageSquare className="w-8 h-8 text-primary" /> },
     { title: "Direct communication", icon: <MessageSquare className="w-8 h-8 text-primary" /> },
     { title: "Friendly service", icon: <ThumbsUp className="w-8 h-8 text-primary" /> },
@@ -77,7 +75,7 @@ export default function WhyChooseUs() {
         </div>
 
         {/* Stats */}
-        <div id="stats-section" className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-10 mb-20">
+        <div id="stats-section" className="grid grid-cols-1 sm:grid-cols-3 gap-6 md:gap-10 mb-20">
           {stats.map((stat, index) => (
             <motion.div 
               key={index}
@@ -91,7 +89,6 @@ export default function WhyChooseUs() {
               <div className="relative z-10">
                 {stat.icon}
                 <div className="text-4xl md:text-5xl font-bold font-heading text-foreground mb-2 flex items-center justify-center">
-                  {stat.prefix}
                   <Counter end={stat.value} suffix={stat.suffix} />
                 </div>
                 <div className="text-sm md:text-base text-muted-foreground font-medium uppercase tracking-wider">{stat.label}</div>

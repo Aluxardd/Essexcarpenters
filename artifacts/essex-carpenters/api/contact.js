@@ -1,15 +1,7 @@
 const recipientEmail = "info@essexcarpenters.co.uk";
 const phonePattern = /^[+\d][\d\s()-]{8,20}$/;
 
-type ContactPayload = {
-  name?: string;
-  email?: string;
-  phone?: string;
-  service?: string;
-  message?: string;
-};
-
-function validatePayload(payload: ContactPayload) {
+function validatePayload(payload) {
   const name = String(payload.name ?? "").trim();
   const email = String(payload.email ?? "").trim();
   const phone = String(payload.phone ?? "").trim();
@@ -41,7 +33,7 @@ function validatePayload(payload: ContactPayload) {
   return { data: { name, email, phone, service, message } };
 }
 
-export default async function handler(req: any, res: any) {
+export default async function handler(req, res) {
   if (req.method !== "POST") {
     res.setHeader("Allow", "POST");
     return res.status(405).json({ error: "Method not allowed" });

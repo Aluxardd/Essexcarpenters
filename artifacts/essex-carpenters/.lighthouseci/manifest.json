@@ -1,0 +1,26 @@
+[
+  {
+    "url": "http://localhost:53017/",
+    "isRepresentativeRun": false,
+    "htmlPath": "C:\\Users\\sergi\\OneDrive\\Desktop\\Essexcarpenters\\artifacts\\essex-carpenters\\.lighthouseci\\localhost--2026_06_28_00_09_28.report.html",
+    "jsonPath": "C:\\Users\\sergi\\OneDrive\\Desktop\\Essexcarpenters\\artifacts\\essex-carpenters\\.lighthouseci\\localhost--2026_06_28_00_09_28.report.json",
+    "summary": {
+      "performance": 0.73,
+      "accessibility": 0.9,
+      "best-practices": 1,
+      "seo": 1
+    }
+  },
+  {
+    "url": "http://localhost:53017/",
+    "isRepresentativeRun": true,
+    "htmlPath": "C:\\Users\\sergi\\OneDrive\\Desktop\\Essexcarpenters\\artifacts\\essex-carpenters\\.lighthouseci\\localhost--2026_06_28_00_10_17.report.html",
+    "jsonPath": "C:\\Users\\sergi\\OneDrive\\Desktop\\Essexcarpenters\\artifacts\\essex-carpenters\\.lighthouseci\\localhost--2026_06_28_00_10_17.report.json",
+    "summary": {
+      "performance": 0.7,
+      "accessibility": 0.9,
+      "best-practices": 1,
+      "seo": 1
+    }
+  }
+]

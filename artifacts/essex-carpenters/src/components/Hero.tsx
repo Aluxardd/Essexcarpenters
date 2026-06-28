@@ -3,6 +3,11 @@ import { CheckCircle2 } from "lucide-react";
 import { Button } from "./ui/button";
 import { useState } from "react";
 
+function responsiveWebpSet(src: string) {
+  const base = src.replace(/\.[a-zA-Z0-9]+$/, "");
+  return `${base}.w640.webp 640w, ${base}.w960.webp 960w, ${base}.w1280.webp 1280w`;
+}
+
 export default function Hero() {
   const { scrollY } = useScroll();
   const y = useTransform(scrollY, [0, 1000], [0, 180]);
@@ -69,8 +74,13 @@ export default function Hero() {
         <div className="absolute inset-0 bg-black/60 dark:bg-black/70 z-10" />
         <motion.img 
           src={heroImageCandidates[imageIndex]} 
+          srcSet={responsiveWebpSet(heroImageCandidates[imageIndex])}
+          sizes="100vw"
           alt="Master Carpenter at Work" 
           onError={handleHeroImageError}
+          loading="eager"
+          fetchPriority="high"
+          decoding="async"
           style={{ y: imageY, scale: imageScale }}
           className="absolute inset-0 block w-full h-full object-cover object-[center_38%] transition-opacity duration-300 opacity-100 border-0 outline-none ring-0 rounded-none shadow-none"
         />

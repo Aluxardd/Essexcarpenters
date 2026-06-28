@@ -1,0 +1,44 @@
+{
+  "ci": {
+    "collect": {
+      "chromePath": "C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe",
+      "staticDistDir": "dist/public",
+      "numberOfRuns": 2,
+      "url": [
+        "http://localhost/"
+      ]
+    },
+    "assert": {
+      "assertions": {
+        "categories:performance": [
+          "warn",
+          {
+            "minScore": 0.85
+          }
+        ],
+        "largest-contentful-paint": [
+          "warn",
+          {
+            "maxNumericValue": 3000
+          }
+        ],
+        "total-blocking-time": [
+          "warn",
+          {
+            "maxNumericValue": 300
+          }
+        ],
+        "cumulative-layout-shift": [
+          "warn",
+          {
+            "maxNumericValue": 0.1
+          }
+        ]
+      }
+    },
+    "upload": {
+      "target": "filesystem",
+      "outputDir": ".lighthouseci"
+    }
+  }
+}

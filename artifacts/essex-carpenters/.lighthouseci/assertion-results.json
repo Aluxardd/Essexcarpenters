@@ -1,0 +1,49 @@
+[
+  {
+    "name": "minScore",
+    "expected": 0.85,
+    "actual": 0.73,
+    "values": [
+      0.73,
+      0.7
+    ],
+    "operator": ">=",
+    "passed": false,
+    "auditProperty": "performance",
+    "auditId": "categories",
+    "level": "warn",
+    "url": "http://localhost:53017/"
+  },
+  {
+    "name": "maxNumericValue",
+    "expected": 3000,
+    "actual": 3929.3779999999992,
+    "values": [
+      3929.3779999999992,
+      3996.3113000000003
+    ],
+    "operator": "<=",
+    "passed": false,
+    "auditId": "largest-contentful-paint",
+    "level": "warn",
+    "url": "http://localhost:53017/",
+    "auditTitle": "Largest Contentful Paint",
+    "auditDocumentationLink": "https://developer.chrome.com/docs/lighthouse/performance/lighthouse-largest-contentful-paint/"
+  },
+  {
+    "name": "maxNumericValue",
+    "expected": 300,
+    "actual": 441.49999999999955,
+    "values": [
+      441.49999999999955,
+      443.8341749999995
+    ],
+    "operator": "<=",
+    "passed": false,
+    "auditId": "total-blocking-time",
+    "level": "warn",
+    "url": "http://localhost:53017/",
+    "auditTitle": "Total Blocking Time",
+    "auditDocumentationLink": "https://developer.chrome.com/docs/lighthouse/performance/lighthouse-total-blocking-time/"
+  }
+]

@@ -40,6 +40,11 @@ function gridImageSizes(size: string) {
   return "(min-width: 1024px) 25vw, (min-width: 768px) 33vw, 50vw";
 }
 
+function responsiveWebpSet(src: string) {
+  const base = src.replace(/\.[a-zA-Z0-9]+$/, "");
+  return `${base}.w640.webp 640w, ${base}.w960.webp 960w, ${base}.w1280.webp 1280w`;
+}
+
 // Tiny transparent PNG (1x1) as a last-resort fallback to avoid broken image icon
 const TRANSPARENT_PX =
   "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg==";
@@ -123,20 +128,27 @@ function GridImage({ src, alt, size, candidatesCsv, legacyFallback }: GridImageP
   }, []);
 
   return (
-    <img
-      ref={imgRef}
-      src={isVisible ? src : TRANSPARENT_PX}
-      alt={alt}
-      loading="lazy"
-      decoding="async"
-      fetchPriority="low"
-      sizes={gridImageSizes(size)}
-      data-candidates={candidatesCsv}
-      data-legacy-fallback={legacyFallback}
-      onError={handleErrorWithCandidates}
-      className="absolute inset-0 w-full h-full object-cover"
-      draggable={false}
-    />
+    <picture>
+      <source
+        type="image/webp"
+        srcSet={isVisible ? responsiveWebpSet(src) : undefined}
+        sizes={gridImageSizes(size)}
+      />
+      <img
+        ref={imgRef}
+        src={isVisible ? src : TRANSPARENT_PX}
+        alt={alt}
+        loading="lazy"
+        decoding="async"
+        fetchPriority="low"
+        sizes={gridImageSizes(size)}
+        data-candidates={candidatesCsv}
+        data-legacy-fallback={legacyFallback}
+        onError={handleErrorWithCandidates}
+        className="absolute inset-0 w-full h-full object-cover"
+        draggable={false}
+      />
+    </picture>
   );
 }
 
@@ -356,17 +368,25 @@ export default function Gallery() {
                 onClick={(e) => e.stopPropagation()}
               >
                 <div className="relative bg-black">
-                  <img
-                    src={lightboxItem.image}
-                    alt={lightboxItem.alt}
-                    loading="eager"
-                    decoding="async"
-                    fetchPriority="high"
-                    data-candidates={getFallbackCandidatesForImage(lightboxItem.category, lightboxItem.image).join(",")}
-                    data-legacy-fallback={lightboxItem.image}
-                    onError={handleErrorWithCandidates}
-                    className="w-full h-auto max-h-[70vh] object-contain bg-black"
-                  />
+                  <picture>
+                    <source
+                      type="image/webp"
+                      srcSet={responsiveWebpSet(lightboxItem.image)}
+                      sizes="(min-width: 1200px) 70vw, 95vw"
+                    />
+                    <img
+                      src={lightboxItem.image}
+                      alt={lightboxItem.alt}
+                      loading="eager"
+                      decoding="async"
+                      fetchPriority="high"
+                      data-candidates={getFallbackCandidatesForImage(lightboxItem.category, lightboxItem.image).join(",")}
+                      data-legacy-fallback={lightboxItem.image}
+                      onError={handleErrorWithCandidates}
+                      sizes="(min-width: 1200px) 70vw, 95vw"
+                      className="w-full h-auto max-h-[70vh] object-contain bg-black"
+                    />
+                  </picture>
                   {/* Caption overlay */}
                   <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-black/0 p-6 text-white">
                     <p className="text-primary font-semibold text-xs uppercase tracking-widest mb-1">{lightboxItem.category}</p>

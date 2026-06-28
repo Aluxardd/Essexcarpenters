@@ -77,11 +77,21 @@ export default function About() {
               className="overflow-hidden rounded-2xl bg-card border border-border"
             >
               <div className="aspect-4/3 overflow-hidden">
-                <img
-                  src="/images/founders.png"
-                  alt="Essex Carpenters founders"
-                  className="block w-full h-full object-cover object-center scale-[1.08]"
-                />
+                <picture>
+                  <source
+                    type="image/webp"
+                    srcSet="/images/founders.w640.webp 640w, /images/founders.w960.webp 960w, /images/founders.w1280.webp 1280w"
+                    sizes="(min-width: 1024px) 50vw, 100vw"
+                  />
+                  <img
+                    src="/images/founders.png"
+                    alt="Essex Carpenters founders"
+                    loading="lazy"
+                    decoding="async"
+                    sizes="(min-width: 1024px) 50vw, 100vw"
+                    className="block w-full h-full object-cover object-center scale-[1.08]"
+                  />
+                </picture>
               </div>
               <div className="p-6 pt-4 text-center">
                 <h3 className="font-bold font-heading text-lg">Founders</h3>

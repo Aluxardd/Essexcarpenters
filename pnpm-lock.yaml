@@ -150,6 +150,10 @@ importers:
         version: 3.1.0
 
   artifacts/essex-carpenters:
+    dependencies:
+      nodemailer:
+        specifier: ^9.0.1
+        version: 9.0.1
     devDependencies:
       '@hookform/resolvers':
         specifier: ^3.10.0
@@ -2314,6 +2318,7 @@ packages:
 
   '@rollup/rollup-win32-x64-msvc@4.62.2':
     resolution: {integrity: sha512-BfzEnDJOt9T8M989/lA37EcJgat01wLRnoi5dQf3QzOH7jzpqTAzdDbVfRljVr5r+jzKqpbHeyOfAaXxAd0PAA==}
+    cpu: [x64]
     os: [win32]
 
   '@scalar/helpers@0.5.2':
@@ -2478,6 +2483,7 @@ packages:
   '@tailwindcss/oxide-win32-x64-msvc@4.3.1':
     resolution: {integrity: sha512-xDEyu1rg290472FEGaKHnzyDyh5QH+AlWvsU5hMoMtPpzmKlRI0jaYKCgSHDYtaQWZOYbMaduSyCwFwY4n1HmA==}
     engines: {node: '>= 20'}
+    cpu: [x64]
     os: [win32]
 
   '@tailwindcss/oxide@4.3.0':
@@ -3791,6 +3797,7 @@ packages:
   lightningcss-win32-x64-msvc@1.32.0:
     resolution: {integrity: sha512-Amq9B/SoZYdDi1kFrojnoqPLxYhQ4Wo5XiL8EVJrVsB8ARoC1PWW6VGtT0WKCemjy8aC+louJnjS7U18x3b06Q==}
     engines: {node: '>= 12.0.0'}
+    cpu: [x64]
     os: [win32]
 
   lightningcss@1.32.0:
@@ -3988,6 +3995,10 @@ packages:
 
   node-releases@2.0.38:
     resolution: {integrity: sha512-3qT/88Y3FbH/Kx4szpQQ4HzUbVrHPKTLVpVocKiLfoYvw9XSGOX2FmD2d6DrXbVYyAQTF2HeF6My8jmzx7/CRw==}
+
+  nodemailer@9.0.1:
+    resolution: {integrity: sha512-Gwv8SQewT616ZM/URn0H54b8PWo/Wum7md3EW2aWy1lO27+WZCX+Xyak3J+NlmHUjDh5ME+uesJUDRbR3Ye8Bw==}
+    engines: {node: '>=6.0.0'}
 
   npm-run-path@6.0.0:
     resolution: {integrity: sha512-9qny7Z9DsQU8Ou39ERsPU4OZQlSTP47ShQzuKZ6PRXpYLtIFgl/DEBYEXKlvcEa+9tHVcK8CF81Y2V72qaZhWA==}
@@ -8260,6 +8271,8 @@ snapshots:
       whatwg-url: 5.0.0
 
   node-releases@2.0.38: {}
+
+  nodemailer@9.0.1: {}
 
   npm-run-path@6.0.0:
     dependencies:

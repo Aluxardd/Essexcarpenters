@@ -1,12 +1,28 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X } from "lucide-react";
 
 export default function FloatingWhatsApp() {
   const [showTooltip, setShowTooltip] = useState(false);
   const [dismissed, setDismissed] = useState(false);
+  const [canHover, setCanHover] = useState(false);
 
   const whatsappUrl = "https://wa.me/447459414385?text=Hi%20Essex%20Carpenters%2C%20I%27d%20like%20to%20request%20a%20free%20quote.";
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia("(hover: hover) and (pointer: fine)");
+    const updateCanHover = () => setCanHover(mediaQuery.matches);
+
+    updateCanHover();
+
+    if (mediaQuery.addEventListener) {
+      mediaQuery.addEventListener("change", updateCanHover);
+      return () => mediaQuery.removeEventListener("change", updateCanHover);
+    }
+
+    mediaQuery.addListener(updateCanHover);
+    return () => mediaQuery.removeListener(updateCanHover);
+  }, []);
 
   return (
     <div className="fixed bottom-6 right-6 z-[90] flex flex-col items-end gap-3">
@@ -40,9 +56,9 @@ export default function FloatingWhatsApp() {
         initial={{ scale: 0, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         transition={{ delay: 2, type: "spring", stiffness: 300, damping: 20 }}
-        onMouseEnter={() => setShowTooltip(true)}
-        onMouseLeave={() => setShowTooltip(false)}
-        className="w-14 h-14 rounded-full flex items-center justify-center shadow-xl transition-transform hover:scale-110 active:scale-95"
+        onMouseEnter={canHover ? () => setShowTooltip(true) : undefined}
+        onMouseLeave={canHover ? () => setShowTooltip(false) : undefined}
+        className={`w-14 h-14 rounded-full flex items-center justify-center shadow-xl transition-transform active:scale-95 ${canHover ? "hover:scale-110" : ""}`}
         style={{ backgroundColor: "#25D366" }}
         aria-label="Chat on WhatsApp"
       >

@@ -34,52 +34,85 @@ const validPayload = {
   message: "Need a full kitchen installation quote for a 3-bed house.",
 };
 
-const originalFetch = global.fetch;
-const originalKey = process.env.RESEND_API_KEY;
 const originalFrom = process.env.CONTACT_FROM_EMAIL;
+const originalHost = process.env.CONTACT_SMTP_HOST;
+const originalPort = process.env.CONTACT_SMTP_PORT;
+const originalUser = process.env.CONTACT_SMTP_USER;
+const originalPass = process.env.CONTACT_SMTP_PASS;
+
+function clearSmtpEnv() {
+  delete process.env.CONTACT_FROM_EMAIL;
+  delete process.env.CONTACT_SMTP_HOST;
+  delete process.env.CONTACT_SMTP_PORT;
+  delete process.env.CONTACT_SMTP_USER;
+  delete process.env.CONTACT_SMTP_PASS;
+}
+
+function setValidSmtpEnv() {
+  process.env.CONTACT_FROM_EMAIL = "Essex Carpenters <info@essexcarpenters.co.uk>";
+  process.env.CONTACT_SMTP_HOST = "smtp.ionos.co.uk";
+  process.env.CONTACT_SMTP_PORT = "587";
+  process.env.CONTACT_SMTP_USER = "info@essexcarpenters.co.uk";
+  process.env.CONTACT_SMTP_PASS = "smtp_password";
+}
 
 try {
   await runCase("GET method blocked", { method: "GET", body: {} }, async () => {
-    delete process.env.RESEND_API_KEY;
-    delete process.env.CONTACT_FROM_EMAIL;
-    global.fetch = originalFetch;
+    clearSmtpEnv();
+    delete globalThis.__CONTACT_SEND_MAIL__;
   });
 
   await runCase("POST missing env", { method: "POST", body: validPayload }, async () => {
-    delete process.env.RESEND_API_KEY;
-    delete process.env.CONTACT_FROM_EMAIL;
-    global.fetch = originalFetch;
+    clearSmtpEnv();
+    delete globalThis.__CONTACT_SEND_MAIL__;
   });
 
   await runCase("POST invalid payload", { method: "POST", body: { ...validPayload, email: "bad" } }, async () => {
-    process.env.RESEND_API_KEY = "test_key";
-    process.env.CONTACT_FROM_EMAIL = "site@example.com";
-    global.fetch = originalFetch;
+    setValidSmtpEnv();
+    globalThis.__CONTACT_SEND_MAIL__ = async () => ({ messageId: "ignored" });
   });
 
-  await runCase("POST resend failure", { method: "POST", body: validPayload }, async () => {
-    process.env.RESEND_API_KEY = "test_key";
-    process.env.CONTACT_FROM_EMAIL = "site@example.com";
-    global.fetch = async () => ({ ok: false });
+  await runCase("POST SMTP failure", { method: "POST", body: validPayload }, async () => {
+    setValidSmtpEnv();
+    globalThis.__CONTACT_SEND_MAIL__ = async () => {
+      throw new Error("SMTP unavailable");
+    };
   });
 
   await runCase("POST success path", { method: "POST", body: validPayload }, async () => {
-    process.env.RESEND_API_KEY = "test_key";
-    process.env.CONTACT_FROM_EMAIL = "site@example.com";
-    global.fetch = async () => ({ ok: true });
+    setValidSmtpEnv();
+    globalThis.__CONTACT_SEND_MAIL__ = async () => ({ messageId: "ok" });
   });
 } finally {
-  if (originalKey === undefined) {
-    delete process.env.RESEND_API_KEY;
-  } else {
-    process.env.RESEND_API_KEY = originalKey;
-  }
-
   if (originalFrom === undefined) {
     delete process.env.CONTACT_FROM_EMAIL;
   } else {
     process.env.CONTACT_FROM_EMAIL = originalFrom;
   }
 
-  global.fetch = originalFetch;
+  if (originalHost === undefined) {
+    delete process.env.CONTACT_SMTP_HOST;
+  } else {
+    process.env.CONTACT_SMTP_HOST = originalHost;
+  }
+
+  if (originalPort === undefined) {
+    delete process.env.CONTACT_SMTP_PORT;
+  } else {
+    process.env.CONTACT_SMTP_PORT = originalPort;
+  }
+
+  if (originalUser === undefined) {
+    delete process.env.CONTACT_SMTP_USER;
+  } else {
+    process.env.CONTACT_SMTP_USER = originalUser;
+  }
+
+  if (originalPass === undefined) {
+    delete process.env.CONTACT_SMTP_PASS;
+  } else {
+    process.env.CONTACT_SMTP_PASS = originalPass;
+  }
+
+  delete globalThis.__CONTACT_SEND_MAIL__;
 }

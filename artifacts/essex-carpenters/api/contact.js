@@ -6,8 +6,6 @@ import nodemailer from "nodemailer";
 const defaultRecipientEmail = "info@essexcarpenters.co.uk";
 const phonePattern = /^[+\d][\d\s()-]{8,20}$/;
 
-let fallbackEnvCache = null;
-
 function stripWrappingQuotes(value) {
   if (
     (value.startsWith('"') && value.endsWith('"')) ||
@@ -47,15 +45,11 @@ function parseEnvFile(content) {
 }
 
 function loadFallbackEnv() {
-  if (fallbackEnvCache) {
-    return fallbackEnvCache;
-  }
-
   const apiDirectory = path.dirname(fileURLToPath(import.meta.url));
   const projectRoot = path.resolve(apiDirectory, "..");
   const envFilePaths = [path.join(projectRoot, ".env.local"), path.join(projectRoot, ".env")];
 
-  fallbackEnvCache = {};
+  let envValues = {};
 
   for (const envFilePath of envFilePaths) {
     if (!fs.existsSync(envFilePath)) {
@@ -63,10 +57,10 @@ function loadFallbackEnv() {
     }
 
     const content = fs.readFileSync(envFilePath, "utf8");
-    fallbackEnvCache = { ...fallbackEnvCache, ...parseEnvFile(content) };
+    envValues = { ...envValues, ...parseEnvFile(content) };
   }
 
-  return fallbackEnvCache;
+  return envValues;
 }
 
 function getEnv(name) {

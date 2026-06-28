@@ -70,6 +70,6 @@
     "zod": "catalog:"
   },
   "dependencies": {
-    "nodemailer": "^9.0.1"
+    "resend": "^4.7.0"
   }
 }

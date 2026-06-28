@@ -1,7 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import nodemailer from "nodemailer";
+import { Resend } from "resend";
 
 const defaultRecipientEmail = "info@essexcarpenters.co.uk";
 const phonePattern = /^[+\d][\d\s()-]{8,20}$/;
@@ -72,39 +72,21 @@ function getEnv(name) {
 
   return loadFallbackEnv()[name];
 }
-
-function parseBoolean(value, defaultValue) {
-  if (value === undefined) {
-    return defaultValue;
-  }
-
-  return String(value).trim().toLowerCase() === "true";
-}
-
-async function sendWithConfiguredTransport(mailOptions, smtpConfig) {
+async function sendWithConfiguredTransport(mailOptions, resendConfig) {
   if (typeof globalThis.__CONTACT_SEND_MAIL__ === "function") {
-    return globalThis.__CONTACT_SEND_MAIL__(mailOptions, smtpConfig);
+    return globalThis.__CONTACT_SEND_MAIL__(mailOptions, resendConfig);
   }
 
-  const transporter = nodemailer.createTransport({
-    host: smtpConfig.host,
-    port: smtpConfig.port,
-    secure: smtpConfig.secure,
-    requireTLS: smtpConfig.requireTLS,
-    auth: {
-      user: smtpConfig.user,
-      pass: smtpConfig.pass,
-    },
-    tls: {
-      servername: smtpConfig.host,
-      minVersion: "TLSv1.2",
-    },
-    connectionTimeout: 15000,
-    greetingTimeout: 15000,
-    socketTimeout: 20000,
-  });
+  const resend = new Resend(resendConfig.apiKey);
+  const result = await resend.emails.send(mailOptions);
 
-  return transporter.sendMail(mailOptions);
+  if (result.error) {
+    const error = new Error(result.error.message || "Resend email send failed");
+    error.code = result.error.name;
+    throw error;
+  }
+
+  return result;
 }
 
 function validatePayload(payload) {
@@ -146,23 +128,13 @@ export default async function handler(req, res) {
   }
 
   const fromEmail = getEnv("CONTACT_FROM_EMAIL");
-  const smtpHost = getEnv("CONTACT_SMTP_HOST");
-  const smtpPortRaw = getEnv("CONTACT_SMTP_PORT") ?? "587";
-  const smtpUser = getEnv("CONTACT_SMTP_USER");
-  const smtpPass = getEnv("CONTACT_SMTP_PASS");
+  const resendApiKey = getEnv("RESEND_API_KEY");
   const recipientEmail = getEnv("CONTACT_TO_EMAIL") ?? defaultRecipientEmail;
 
-  const smtpPort = Number(smtpPortRaw);
-  const smtpSecure = parseBoolean(getEnv("CONTACT_SMTP_SECURE"), smtpPort === 465);
-  const smtpRequireTls = parseBoolean(getEnv("CONTACT_SMTP_REQUIRE_TLS"), smtpPort === 587);
-
-  if (!fromEmail || !smtpHost || !smtpUser || !smtpPass || Number.isNaN(smtpPort)) {
+  if (!fromEmail || !resendApiKey) {
     const missing = [
       !fromEmail ? "CONTACT_FROM_EMAIL" : null,
-      !smtpHost ? "CONTACT_SMTP_HOST" : null,
-      Number.isNaN(smtpPort) ? "CONTACT_SMTP_PORT" : null,
-      !smtpUser ? "CONTACT_SMTP_USER" : null,
-      !smtpPass ? "CONTACT_SMTP_PASS" : null,
+      !resendApiKey ? "RESEND_API_KEY" : null,
     ].filter(Boolean);
 
     return res.status(500).json({
@@ -178,46 +150,34 @@ export default async function handler(req, res) {
 
   const { name, email, phone, service, message } = result.data;
 
+  const mailOptions = {
+    from: fromEmail,
+    to: recipientEmail,
+    replyTo: email,
+    subject: `Free quote request from ${name}`,
+    text: [
+      `Name: ${name}`,
+      `Email: ${email}`,
+      `Phone: ${phone}`,
+      `Service: ${service}`,
+      "",
+      "Project details:",
+      message,
+    ].join("\n"),
+  };
+
   try {
-    await sendWithConfiguredTransport(
-      {
-      from: fromEmail,
-      to: recipientEmail,
-      replyTo: email,
-      subject: `Free quote request from ${name}`,
-      text: [
-        `Name: ${name}`,
-        `Email: ${email}`,
-        `Phone: ${phone}`,
-        `Service: ${service}`,
-        "",
-        "Project details:",
-        message,
-      ].join("\n"),
-      },
-      {
-        host: smtpHost,
-        port: smtpPort,
-        secure: smtpSecure,
-        requireTLS: smtpRequireTls,
-        user: smtpUser,
-        pass: smtpPass,
-      },
-    );
+    await sendWithConfiguredTransport(mailOptions, { apiKey: resendApiKey });
   } catch (error) {
     console.error("Contact email send failed", {
       code: error?.code,
-      command: error?.command,
-      responseCode: error?.responseCode,
-      response: error?.response,
       message: error?.message,
     });
 
     if (process.env.NODE_ENV !== "production") {
       return res.status(502).json({
-        error: "Unable to send your enquiry right now. Please check SMTP credentials and host settings.",
-        smtpErrorCode: error?.code ?? null,
-        smtpResponseCode: error?.responseCode ?? null,
+        error: "Unable to send your enquiry right now. Please check Resend API key and sender domain settings.",
+        resendErrorCode: error?.code ?? null,
       });
     }
 

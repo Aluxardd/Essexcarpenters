@@ -35,52 +35,43 @@ const validPayload = {
 };
 
 const originalFrom = process.env.CONTACT_FROM_EMAIL;
-const originalHost = process.env.CONTACT_SMTP_HOST;
-const originalPort = process.env.CONTACT_SMTP_PORT;
-const originalUser = process.env.CONTACT_SMTP_USER;
-const originalPass = process.env.CONTACT_SMTP_PASS;
+const originalResendApiKey = process.env.RESEND_API_KEY;
 
-function clearSmtpEnv() {
+function clearEmailEnv() {
   delete process.env.CONTACT_FROM_EMAIL;
-  delete process.env.CONTACT_SMTP_HOST;
-  delete process.env.CONTACT_SMTP_PORT;
-  delete process.env.CONTACT_SMTP_USER;
-  delete process.env.CONTACT_SMTP_PASS;
+  delete process.env.RESEND_API_KEY;
 }
 
-function setValidSmtpEnv() {
+function setValidEmailEnv() {
   process.env.CONTACT_FROM_EMAIL = "Essex Carpenters <info@essexcarpenters.co.uk>";
-  process.env.CONTACT_SMTP_HOST = "smtp.ionos.co.uk";
-  process.env.CONTACT_SMTP_PORT = "587";
-  process.env.CONTACT_SMTP_USER = "info@essexcarpenters.co.uk";
-  process.env.CONTACT_SMTP_PASS = "smtp_password";
+  process.env.RESEND_API_KEY = "re_test_api_key";
 }
 
 try {
   await runCase("GET method blocked", { method: "GET", body: {} }, async () => {
-    clearSmtpEnv();
+    clearEmailEnv();
     delete globalThis.__CONTACT_SEND_MAIL__;
   });
 
   await runCase("POST missing env", { method: "POST", body: validPayload }, async () => {
-    clearSmtpEnv();
+    clearEmailEnv();
     delete globalThis.__CONTACT_SEND_MAIL__;
   });
 
   await runCase("POST invalid payload", { method: "POST", body: { ...validPayload, email: "bad" } }, async () => {
-    setValidSmtpEnv();
+    setValidEmailEnv();
     globalThis.__CONTACT_SEND_MAIL__ = async () => ({ messageId: "ignored" });
   });
 
-  await runCase("POST SMTP failure", { method: "POST", body: validPayload }, async () => {
-    setValidSmtpEnv();
+  await runCase("POST Resend failure", { method: "POST", body: validPayload }, async () => {
+    setValidEmailEnv();
     globalThis.__CONTACT_SEND_MAIL__ = async () => {
-      throw new Error("SMTP unavailable");
+      throw new Error("Resend unavailable");
     };
   });
 
   await runCase("POST success path", { method: "POST", body: validPayload }, async () => {
-    setValidSmtpEnv();
+    setValidEmailEnv();
     globalThis.__CONTACT_SEND_MAIL__ = async () => ({ messageId: "ok" });
   });
 } finally {
@@ -90,28 +81,10 @@ try {
     process.env.CONTACT_FROM_EMAIL = originalFrom;
   }
 
-  if (originalHost === undefined) {
-    delete process.env.CONTACT_SMTP_HOST;
+  if (originalResendApiKey === undefined) {
+    delete process.env.RESEND_API_KEY;
   } else {
-    process.env.CONTACT_SMTP_HOST = originalHost;
-  }
-
-  if (originalPort === undefined) {
-    delete process.env.CONTACT_SMTP_PORT;
-  } else {
-    process.env.CONTACT_SMTP_PORT = originalPort;
-  }
-
-  if (originalUser === undefined) {
-    delete process.env.CONTACT_SMTP_USER;
-  } else {
-    process.env.CONTACT_SMTP_USER = originalUser;
-  }
-
-  if (originalPass === undefined) {
-    delete process.env.CONTACT_SMTP_PASS;
-  } else {
-    process.env.CONTACT_SMTP_PASS = originalPass;
+    process.env.RESEND_API_KEY = originalResendApiKey;
   }
 
   delete globalThis.__CONTACT_SEND_MAIL__;

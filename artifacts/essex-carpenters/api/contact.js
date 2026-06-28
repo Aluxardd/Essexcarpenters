@@ -90,10 +90,18 @@ async function sendWithConfiguredTransport(mailOptions, smtpConfig) {
     host: smtpConfig.host,
     port: smtpConfig.port,
     secure: smtpConfig.secure,
+    requireTLS: smtpConfig.requireTLS,
     auth: {
       user: smtpConfig.user,
       pass: smtpConfig.pass,
     },
+    tls: {
+      servername: smtpConfig.host,
+      minVersion: "TLSv1.2",
+    },
+    connectionTimeout: 15000,
+    greetingTimeout: 15000,
+    socketTimeout: 20000,
   });
 
   return transporter.sendMail(mailOptions);
@@ -146,6 +154,7 @@ export default async function handler(req, res) {
 
   const smtpPort = Number(smtpPortRaw);
   const smtpSecure = parseBoolean(getEnv("CONTACT_SMTP_SECURE"), smtpPort === 465);
+  const smtpRequireTls = parseBoolean(getEnv("CONTACT_SMTP_REQUIRE_TLS"), smtpPort === 587);
 
   if (!fromEmail || !smtpHost || !smtpUser || !smtpPass || Number.isNaN(smtpPort)) {
     const missing = [
@@ -190,11 +199,28 @@ export default async function handler(req, res) {
         host: smtpHost,
         port: smtpPort,
         secure: smtpSecure,
+        requireTLS: smtpRequireTls,
         user: smtpUser,
         pass: smtpPass,
       },
     );
-  } catch {
+  } catch (error) {
+    console.error("Contact email send failed", {
+      code: error?.code,
+      command: error?.command,
+      responseCode: error?.responseCode,
+      response: error?.response,
+      message: error?.message,
+    });
+
+    if (process.env.NODE_ENV !== "production") {
+      return res.status(502).json({
+        error: "Unable to send your enquiry right now. Please check SMTP credentials and host settings.",
+        smtpErrorCode: error?.code ?? null,
+        smtpResponseCode: error?.responseCode ?? null,
+      });
+    }
+
     return res.status(502).json({ error: "Unable to send your enquiry right now. Please try again later." });
   }
 

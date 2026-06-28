@@ -6,6 +6,21 @@ import { Resend } from "resend";
 const defaultRecipientEmail = "info@essexcarpenters.co.uk";
 const phonePattern = /^[+\d][\d\s()-]{8,20}$/;
 
+function parseRecipientEmails(value) {
+  const raw = String(value ?? "").trim();
+
+  if (!raw) {
+    return [defaultRecipientEmail];
+  }
+
+  const recipients = raw
+    .split(/[;,]/)
+    .map((email) => email.trim())
+    .filter(Boolean);
+
+  return recipients.length > 0 ? recipients : [defaultRecipientEmail];
+}
+
 function stripWrappingQuotes(value) {
   if (
     (value.startsWith('"') && value.endsWith('"')) ||
@@ -72,6 +87,77 @@ function getEnv(name) {
 
   return loadFallbackEnv()[name];
 }
+
+function escapeHtml(value) {
+  return String(value)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/\"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
+function buildQuoteRequestEmailHtml({ name, email, phone, service, message }) {
+  const safeName = escapeHtml(name);
+  const safeEmail = escapeHtml(email);
+  const safePhone = escapeHtml(phone);
+  const safeService = escapeHtml(service);
+  const safeMessage = escapeHtml(message).replace(/\r?\n/g, "<br />");
+
+  return `
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>New Quote Request</title>
+  </head>
+  <body style="margin:0;padding:0;background:#f7f7f5;font-family:Arial,sans-serif;color:#1f1f1f;">
+    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background:#f7f7f5;padding:24px 0;">
+      <tr>
+        <td align="center">
+          <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="max-width:640px;background:#ffffff;border:1px solid #e8e8e4;border-radius:14px;overflow:hidden;">
+            <tr>
+              <td style="padding:24px 28px;background:linear-gradient(135deg,#3a3027,#1f1a15);color:#ffffff;">
+                <p style="margin:0 0 8px 0;font-size:12px;letter-spacing:1.2px;text-transform:uppercase;opacity:0.85;">Essex Carpenters</p>
+                <h1 style="margin:0;font-size:24px;line-height:1.3;">New Quote Request</h1>
+                <p style="margin:10px 0 0 0;font-size:14px;opacity:0.92;">A new enquiry was submitted from the website form.</p>
+              </td>
+            </tr>
+            <tr>
+              <td style="padding:24px 28px;">
+                <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="border-collapse:separate;border-spacing:0 10px;">
+                  <tr>
+                    <td style="width:32%;font-weight:bold;color:#4a4a4a;">Name</td>
+                    <td style="background:#f4f4f1;border:1px solid #ecece8;border-radius:8px;padding:10px 12px;">${safeName}</td>
+                  </tr>
+                  <tr>
+                    <td style="font-weight:bold;color:#4a4a4a;">Email</td>
+                    <td style="background:#f4f4f1;border:1px solid #ecece8;border-radius:8px;padding:10px 12px;">${safeEmail}</td>
+                  </tr>
+                  <tr>
+                    <td style="font-weight:bold;color:#4a4a4a;">Phone</td>
+                    <td style="background:#f4f4f1;border:1px solid #ecece8;border-radius:8px;padding:10px 12px;">${safePhone}</td>
+                  </tr>
+                  <tr>
+                    <td style="font-weight:bold;color:#4a4a4a;">Service</td>
+                    <td style="background:#f4f4f1;border:1px solid #ecece8;border-radius:8px;padding:10px 12px;">${safeService}</td>
+                  </tr>
+                </table>
+                <div style="margin-top:16px;">
+                  <p style="margin:0 0 8px 0;font-weight:bold;color:#4a4a4a;">Project Details</p>
+                  <div style="background:#f4f4f1;border:1px solid #ecece8;border-radius:8px;padding:14px 12px;font-size:14px;line-height:1.6;color:#1f1f1f;">${safeMessage}</div>
+                </div>
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>`;
+}
+
 async function sendWithConfiguredTransport(mailOptions, resendConfig) {
   if (typeof globalThis.__CONTACT_SEND_MAIL__ === "function") {
     return globalThis.__CONTACT_SEND_MAIL__(mailOptions, resendConfig);
@@ -129,7 +215,7 @@ export default async function handler(req, res) {
 
   const fromEmail = getEnv("CONTACT_FROM_EMAIL");
   const resendApiKey = getEnv("RESEND_API_KEY");
-  const recipientEmail = getEnv("CONTACT_TO_EMAIL") ?? defaultRecipientEmail;
+  const recipientEmails = parseRecipientEmails(getEnv("CONTACT_TO_EMAIL"));
 
   if (!fromEmail || !resendApiKey) {
     const missing = [
@@ -152,9 +238,10 @@ export default async function handler(req, res) {
 
   const mailOptions = {
     from: fromEmail,
-    to: recipientEmail,
+    to: recipientEmails,
     replyTo: email,
     subject: `Free quote request from ${name}`,
+    html: buildQuoteRequestEmailHtml({ name, email, phone, service, message }),
     text: [
       `Name: ${name}`,
       `Email: ${email}`,
